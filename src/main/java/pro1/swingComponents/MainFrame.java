@@ -1,55 +1,59 @@
 package pro1.swingComponents;
 
 import pro1.drawingModel.*;
-import pro1.drawingModel.Rectangle;
-import pro1.utils.ColorUtils;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class MainFrame extends JFrame {
     private DisplayPanel displayPanel;
-    private int x;
-    private int y;
-    private String color = "#000000";
 
-    public void setColor(String color) {
-        this.color = color;
-    }
+    private int x, y;
+    private double scale = 1.0;
+    private double rotation = 0.0;
+
+    private boolean redMode = false;
 
     public MainFrame() {
-        this.setTitle("PRO1 Drawing");
-        this.setVisible(true);
-        this.setSize(800, 800);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setTitle("PRO1 Drawing");
+        setSize(800, 800);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        this.displayPanel = new DisplayPanel();
-        this.add(this.displayPanel, BorderLayout.CENTER);
+        displayPanel = new DisplayPanel();
+        add(displayPanel, java.awt.BorderLayout.CENTER);
 
         JPanel leftPanel = new OptionsPanel(this);
-        this.add(leftPanel, BorderLayout.WEST);
+        add(leftPanel, java.awt.BorderLayout.WEST);
 
-        this.displayPanel.addMouseListener(new MouseAdapter() {
+        setVisible(true);
+
+        displayPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                MainFrame.this.x = e.getX();
-                MainFrame.this.y = e.getY();
-                MainFrame.this.showExample();
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                x = e.getX();
+                y = e.getY();
+                showExample();
             }
         });
     }
 
-    public void showExample(){
-        MainFrame.this.displayPanel.setDrawable(this.example());
+    public void setScale(double scale) { this.scale = scale; }
+    public void setRotation(double rotation) { this.rotation = rotation; }
+    public void setRedMode(boolean value) { this.redMode = value; }
+    public DisplayPanel getDisplayPanel() { return displayPanel; }
+
+    public void showExample() {
+        displayPanel.addDrawable(example());
     }
 
     private Drawable example() {
-        var d1 = new Ellipse(0, 0, 150, 250, this.color);
-        var d2 = new Text(0, 0, this.color);
-        var d3 = new Line(0, 50,170,170,3, this.color);
-        return new Group(new Drawable[]{d1, d2, d3}, this.x, this.y, 40, 1, 1);
+        String color = redMode ? "#FF0000" : "#808080";
+
+        Drawable d1 = new Rectangle(10, 70, 150, 100, color);
+        Drawable d2 = new Triangle(0, 0, 170, 75, color);
+
+        return new Group(new Drawable[]{d1, d2}, x, y, rotation, scale, scale);
     }
+
+    public void clearAll() { displayPanel.clear(); }
 }
